@@ -1,0 +1,13 @@
+# Environment secrets
+.env
+.env.*
+!.env.example
+
+# Dependencies and generated output
+**/node_modules/
+**/dist/
+*.tsbuildinfo
+
+# Local tooling
+.DS_Store
+.vscode/
