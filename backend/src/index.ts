@@ -15,10 +15,18 @@ const server=createServer(app);
 const websocketServer=new WebSocketServer({noServer:true});
 const shareSockets=new Map<string,Set<WebSocket>>();
 
+const allowedOrigins = (process.env.FRONTEND_URL ?? 'http://localhost:5173')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
 app.use(cors({
-    origin: "http://localhost:5173"
+    origin: allowedOrigins
 }));
 app.use(express.json());
+app.get('/health',(req,res)=>{
+    res.status(200).json({status:'ok'});
+});
 declare global{
     namespace Express{
         interface Request{
@@ -401,8 +409,9 @@ async function startServer() {
 
         console.log("MongoDB connected successfully");
 
-        server.listen(3000, () => {
-            console.log("Server running on port 3000");
+        const port = Number(process.env.PORT) || 3000;
+        server.listen(port, () => {
+            console.log(`Server running on port ${port}`);
         });
 
     } catch (error) {
