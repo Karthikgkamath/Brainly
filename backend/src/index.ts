@@ -17,11 +17,15 @@ const shareSockets=new Map<string,Set<WebSocket>>();
 
 const allowedOrigins = (process.env.FRONTEND_URL ?? 'http://localhost:5173')
     .split(',')
-    .map((origin) => origin.trim())
+    .map((origin) => origin.trim().replace(/\/$/, ''))
     .filter(Boolean);
 
 app.use(cors({
-    origin: allowedOrigins
+    origin: (origin, callback) => {
+        const isBrainlyVercelPreview = origin !== undefined
+            && /^https:\/\/brainly-[a-z0-9-]+\.vercel\.app$/.test(origin);
+        callback(null, !origin || allowedOrigins.includes(origin) || isBrainlyVercelPreview);
+    }
 }));
 app.use(express.json());
 app.get('/health',(req,res)=>{
